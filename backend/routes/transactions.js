@@ -63,4 +63,27 @@ router.get('/', async (req, res) => {
   }
 });
 
+// @route   DELETE /api/transactions/:id
+// @desc    Delete a transaction by ID
+router.delete('/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id) || id <= 0) {
+      return res.status(400).json({ error: 'Invalid transaction ID' });
+    }
+
+    const query = 'DELETE FROM transactions WHERE id = ?';
+    const [result] = await db.query(query, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+
+    res.status(200).json({ message: 'Transaction deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting transaction:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;
