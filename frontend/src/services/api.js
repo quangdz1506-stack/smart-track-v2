@@ -1,0 +1,44 @@
+const API_BASE_URL = 'http://localhost:5000/api';
+
+export const fetchTransactionsApi = async (filters = {}) => {
+  try {
+    const query = new URLSearchParams(filters).toString();
+    const url = query ? `${API_BASE_URL}/transactions?${query}` : `${API_BASE_URL}/transactions`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('API Error in fetchTransactionsApi:', error);
+    throw error;
+  }
+};
+
+export const createTransactionApi = async (data) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/transactions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('API Error in createTransactionApi:', error);
+    throw error;
+  }
+};
+
+export const deleteTransactionApi = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('API Error in deleteTransactionApi:', error);
+    throw error;
+  }
+};
