@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const TransactionList = ({ transactions, onDelete }) => {
+const TransactionList = ({ transactions, onDelete, onEdit }) => {
   const [filterType, setFilterType] = useState('all');
 
   const filteredTransactions = transactions.filter(t => {
@@ -46,6 +46,13 @@ const TransactionList = ({ transactions, onDelete }) => {
                 <span style={{ fontWeight: 'bold', color: t.type === 'income' ? 'var(--success-color)' : 'var(--text-primary)' }}>
                   {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
                 </span>
+                <button 
+                  onClick={() => onEdit(t)}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', padding: '0.5rem' }}
+                  title="Edit"
+                >
+                  ✎
+                </button>
                 <button 
                   onClick={() => onDelete(t.id)}
                   style={{ background: 'transparent', border: 'none', color: 'var(--danger-color)', cursor: 'pointer', padding: '0.5rem' }}

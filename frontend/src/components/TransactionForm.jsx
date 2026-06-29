@@ -1,6 +1,7 @@
-import { useState } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useState, useEffect } from 'react';
 
-const TransactionForm = ({ onSubmitTransaction }) => {
+const TransactionForm = ({ onSubmitTransaction, editingTransaction, onCancelEdit }) => {
   const [formData, setFormData] = useState({
     amount: '',
     type: 'expense',
@@ -9,6 +10,26 @@ const TransactionForm = ({ onSubmitTransaction }) => {
     description: ''
   });
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (editingTransaction) {
+      setFormData({
+        amount: editingTransaction.amount,
+        type: editingTransaction.type,
+        category: editingTransaction.category,
+        date: editingTransaction.date ? new Date(editingTransaction.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        description: editingTransaction.description || ''
+      });
+    } else {
+      setFormData({
+        amount: '',
+        type: 'expense',
+        category: '',
+        date: new Date().toISOString().split('T')[0],
+        description: ''
+      });
+    }
+  }, [editingTransaction]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,13 +52,15 @@ const TransactionForm = ({ onSubmitTransaction }) => {
 
     onSubmitTransaction(formData);
     
-    setFormData({
-      amount: '',
-      type: 'expense',
-      category: '',
-      date: new Date().toISOString().split('T')[0],
-      description: ''
-    });
+    if (!editingTransaction) {
+      setFormData({
+        amount: '',
+        type: 'expense',
+        category: '',
+        date: new Date().toISOString().split('T')[0],
+        description: ''
+      });
+    }
   };
 
   const inputStyle = {
@@ -53,7 +76,18 @@ const TransactionForm = ({ onSubmitTransaction }) => {
 
   return (
     <div style={{ background: 'var(--surface-color)', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--border-color)', marginBottom: '2rem' }}>
-      <h3 style={{ margin: '0 0 1rem 0' }}>Add Transaction</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h3 style={{ margin: 0 }}>{editingTransaction ? 'Edit Transaction' : 'Add Transaction'}</h3>
+        {editingTransaction && (
+          <button 
+            onClick={onCancelEdit}
+            style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+            type="button"
+          >
+            Cancel Edit
+          </button>
+        )}
+      </div>
       
       {error && <p style={{ color: 'var(--danger-color)', marginBottom: '1rem' }}>{error}</p>}
       
@@ -91,7 +125,7 @@ const TransactionForm = ({ onSubmitTransaction }) => {
         </div>
 
         <button type="submit" style={{ padding: '0.75rem 1.5rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-          Add Transaction
+          {editingTransaction ? 'Update Transaction' : 'Add Transaction'}
         </button>
       </form>
     </div>

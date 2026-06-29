@@ -30,6 +30,23 @@ export const createTransactionApi = async (data) => {
   }
 };
 
+export const updateTransactionApi = async (id, data) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('API Error in updateTransactionApi:', error);
+    throw error;
+  }
+};
+
 export const deleteTransactionApi = async (id) => {
   try {
     const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {

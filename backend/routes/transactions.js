@@ -63,6 +63,44 @@ router.get('/', async (req, res) => {
   }
 });
 
+// @route   PUT /api/transactions/:id
+// @desc    Update a transaction by ID
+router.put('/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id) || id <= 0) {
+      return res.status(400).json({ error: 'Invalid transaction ID' });
+    }
+
+    const { amount, type, category, date, description } = req.body;
+
+    if (!amount || isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ error: 'Valid positive amount is required' });
+    }
+    if (!type || (type !== 'income' && type !== 'expense')) {
+      return res.status(400).json({ error: 'Type must be either income or expense' });
+    }
+    if (!category || typeof category !== 'string' || category.trim() === '') {
+      return res.status(400).json({ error: 'Valid category is required' });
+    }
+    if (!date || isNaN(Date.parse(date))) {
+      return res.status(400).json({ error: 'Valid date is required' });
+    }
+
+    const query = 'UPDATE transactions SET amount = ?, type = ?, category = ?, date = ?, description = ? WHERE id = ?';
+    const [result] = await db.query(query, [amount, type, category, date, description || null, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+
+    res.status(200).json({ message: 'Transaction updated successfully' });
+  } catch (error) {
+    console.error('Error updating transaction:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // @route   DELETE /api/transactions/:id
 // @desc    Delete a transaction by ID
 router.delete('/:id', async (req, res) => {

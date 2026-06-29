@@ -4,13 +4,14 @@ import { useTheme } from './context/ThemeContext';
 import DashboardSummary from './components/DashboardSummary';
 import TransactionForm from './components/TransactionForm';
 import TransactionList from './components/TransactionList';
-import { fetchTransactionsApi, createTransactionApi, deleteTransactionApi } from './services/api';
+import { fetchTransactionsApi, createTransactionApi, deleteTransactionApi, updateTransactionApi } from './services/api';
 
 function App() {
   const { theme, toggleTheme } = useTheme();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [editingTransaction, setEditingTransaction] = useState(null);
 
   const loadTransactions = async () => {
     setLoading(true);
@@ -34,14 +35,19 @@ function App() {
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + Number(t.amount), 0);
   const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + Number(t.amount), 0);
 
-  const handleAddTransaction = async (newTx) => {
+  const handleSaveTransaction = async (formData) => {
     try {
       setError(null);
-      await createTransactionApi(newTx);
+      if (editingTransaction) {
+        await updateTransactionApi(editingTransaction.id, formData);
+        setEditingTransaction(null);
+      } else {
+        await createTransactionApi(formData);
+      }
       await loadTransactions();
     } catch (err) {
       console.error(err);
-      setError('Failed to add transaction.');
+      setError(editingTransaction ? 'Failed to update transaction.' : 'Failed to add transaction.');
     }
   };
 
@@ -49,11 +55,23 @@ function App() {
     try {
       setError(null);
       await deleteTransactionApi(id);
+      if (editingTransaction && editingTransaction.id === id) {
+        setEditingTransaction(null);
+      }
       await loadTransactions();
     } catch (err) {
       console.error(err);
       setError('Failed to delete transaction.');
     }
+  };
+
+  const handleEditTransaction = (transaction) => {
+    setEditingTransaction(transaction);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTransaction(null);
   };
 
   return (
@@ -93,11 +111,16 @@ function App() {
             totalExpenses={totalExpenses} 
           />
 
-          <TransactionForm onSubmitTransaction={handleAddTransaction} />
+          <TransactionForm 
+            onSubmitTransaction={handleSaveTransaction} 
+            editingTransaction={editingTransaction}
+            onCancelEdit={handleCancelEdit}
+          />
 
           <TransactionList 
             transactions={transactions} 
             onDelete={handleDeleteTransaction} 
+            onEdit={handleEditTransaction}
           />
         </>
       )}
