@@ -58,7 +58,13 @@
 - ✅ Task 9.4: Build Login and Registration UI Components.
 
 ## Current Phase: Phase 10 (End-to-End Automation Testing)
-- ⬜ Task 10.1: Initialize E2E Testing Framework.
-- ⬜ Task 10.2: Write Auth Flow Test Scripts.
-- ⬜ Task 10.3: Write Transaction CRUD Test Scripts.
-- ⬜ Task 10.4: CI Pipeline Integration.
+- ✅ Task 10.1: Initialize E2E Testing Framework.
+- ✅ Task 10.2: Write Auth Flow Test Scripts.
+- ✅ Task 10.3: Write Transaction CRUD Test Scripts.
+- ✅ Task 10.4: CI Pipeline Integration.
+
+## Current Phase: Phase 11 (Budgets, Goals & Settings Enrichment)
+- ✅ Task 11.1: Backend - Dynamic Budgets & Account Management Endpoints
+- ✅ Task 11.2: Frontend - Budgets CRUD & Dynamic Progress UI
+- ✅ Task 11.3: Frontend - Goals CRUD & Funding UI
+- ✅ Task 11.4: Frontend - Settings Preferences & Danger Zone Logic

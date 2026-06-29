@@ -1,6 +1,6 @@
-# QA & Testing Progress Plan
+# QA & Testing Progress Plan (Phase 10 Update)
 
-This document outlines the systematic testing strategy for the Smart Expense Tracker v2 to ensure high reliability, security, and user experience.
+This document outlines the systematic, comprehensive testing strategy for Smart Expense Tracker v2. It has been updated to include the newly implemented authentication flow and E2E testing framework.
 
 ## Status Legend
 - ⬜ [PENDING]: Test has not been executed yet.
@@ -10,56 +10,72 @@ This document outlines the systematic testing strategy for the Smart Expense Tra
 
 ---
 
-## 1. Frontend: UI/UX & State Testing
-- ✅ **Test 1.1: Theme Persistence**
+## 1. Authentication & Security (E2E & API)
+- ✅ **Test 1.1: Registration Flow**
+  - *Action:* Register a new user with valid credentials via UI.
+  - *Expected:* Successful creation in DB, immediate redirect to `/login`.
+- ✅ **Test 1.2: Login & JWT Issuance**
+  - *Action:* Login with correct credentials.
+  - *Expected:* Receive JWT, redirect to `/dashboard`, `AuthContext` stores user state.
+- ⬜ **Test 1.3: Route Guard Protection**
+  - *Action:* Attempt to navigate to `/dashboard` or `/budgets` while logged out.
+  - *Expected:* Immediate redirect to `/login`.
+- ✅ **Test 1.4: Invalid Credentials Handling**
+  - *Action:* Attempt login with wrong password.
+  - *Expected:* Error banner displayed; no navigation occurs.
+
+---
+
+## 2. Core Functional Testing (Transactions CRUD)
+- ✅ **Test 2.1: Transaction Creation**
+  - *Action:* Submit a valid Income/Expense transaction.
+  - *Expected:* Saves to DB linked to `user_id`, UI list updates instantly.
+- ⬜ **Test 2.2: User Data Isolation**
+  - *Action:* Log in as User A, create transaction. Log in as User B.
+  - *Expected:* User B cannot see User A's transactions.
+- ⬜ **Test 2.3: Transaction Update (PUT)**
+  - *Action:* Edit transaction amount and category.
+  - *Expected:* Database updates successfully; dashboard charts reflect new totals.
+- ⬜ **Test 2.4: Transaction Deletion (DELETE)**
+  - *Action:* Delete a transaction.
+  - *Expected:* Removed from UI and DB.
+
+---
+
+## 3. Financial Tools (Budgets & Goals)
+- ⬜ **Test 3.1: Budget Tracking**
+  - *Action:* Create a budget limit for a category. Add expenses in that category.
+  - *Expected:* Budget progress bar updates automatically reflecting the `spent_amount`.
+- ⬜ **Test 3.2: Goals Management**
+  - *Action:* Create a financial goal.
+  - *Expected:* Goal appears in the list with correctly calculated remaining amount.
+
+---
+
+## 4. Frontend UI/UX & Responsive Design (Stitch Aesthetics)
+- ⬜ **Test 4.1: Theme Persistence**
   - *Action:* Toggle Dark/Light mode, then refresh the page.
-  - *Expected:* The theme choice should persist seamlessly without flashing white.
-- ✅ **Test 1.2: Responsive Design**
-  - *Action:* Resize the browser window to mobile width (<600px).
-  - *Expected:* The Dashboard charts and Transaction form should stack vertically and remain readable.
-- ✅ **Test 1.3: Data Visualization (Recharts)**
-  - *Action:* Add extreme values (e.g., $99,999,999) and zero values.
-  - *Expected:* The Pie and Bar charts should not break layout and tooltips should format currency correctly.
-- ✅ **Test 1.4: Error Boundary Display**
-  - *Action:* Disconnect the backend server and refresh the frontend.
-  - *Expected:* The UI should display a clean, user-friendly error message ("Failed to connect to the server").
+  - *Expected:* Theme choice persists.
+- ⬜ **Test 4.2: Mobile Responsiveness**
+  - *Action:* Resize browser to <600px width.
+  - *Expected:* Sidebar hides, BottomNavBar appears, grid adjusts to single column.
+- ⬜ **Test 4.3: Chart Re-rendering**
+  - *Action:* Add extreme/zero values to transactions.
+  - *Expected:* Recharts visualizations adjust gracefully without breaking layout.
 
 ---
 
-## 2. Full-Stack Functional Testing (CRUD)
-- ✅ **Test 2.1: Create Transaction (Validation)**
-  - *Action:* Attempt to submit a transaction with an empty amount or empty category.
-  - *Expected:* Frontend should block the submission and display a red validation error.
-- ✅ **Test 2.2: Create Transaction (Success)**
-  - *Action:* Submit a valid Income and Expense transaction.
-  - *Expected:* Both should appear immediately in the list, and the Dashboard totals must update accurately.
-- ✅ **Test 2.3: Edit Transaction (PUT)**
-  - *Action:* Click the 'Edit' (✎) button on a transaction, change the amount, and submit.
-  - *Expected:* The form should populate correctly, update the database, and refresh the UI list without a page reload.
-- ✅ **Test 2.4: Delete Transaction (DELETE)**
-  - *Action:* Click the 'Delete' (✕) button on a transaction.
-  - *Expected:* The transaction should be removed from the list and database, and Dashboard totals should recalculate.
+## 5. DevOps & Automation Pipeline
+- ✅ **Test 5.1: Playwright Framework Initialization**
+  - *Action:* Configure `@playwright/test` and run `sanity.spec.js`.
+  - *Expected:* Tests execute against localhost successfully.
+- ⬜ **Test 5.2: CI Pipeline E2E Execution**
+  - *Action:* Push to GitHub `main` branch.
+  - *Expected:* GitHub Actions runs ESLint, Vite build, and Playwright tests successfully.
+- ⬜ **Test 5.3: Docker Compose Services**
+  - *Action:* Run `docker-compose up --build`.
+  - *Expected:* MySQL, Backend (Node), and Frontend (Nginx) containers start perfectly with correct network links.
 
 ---
 
-## 3. Backend & Security Testing
-- ✅ **Test 3.1: SQL Injection Protection**
-  - *Action:* Send a POST request with the category: `Food'; DROP TABLE transactions;--`.
-  - *Expected:* The database should safely insert the literal string without executing the dropped table command.
-- ✅ **Test 3.2: API Payload Validation**
-  - *Action:* Send a POST/PUT request with `{ amount: -50, type: "invalid" }` using Postman/Curl.
-  - *Expected:* The backend should return a `400 Bad Request` with a descriptive error message.
-
----
-
-## 4. DevOps & Deployment Testing
-- ✅ **Test 4.1: GitHub Actions CI**
-  - *Action:* Push a new commit containing a deliberate ESLint error (e.g., unused variable).
-  - *Expected:* The GitHub Action pipeline should fail and block the merge.
-- ✅ **Test 4.2: Docker Compose Orchestration**
-  - *Action:* Run `docker-compose up --build` on a fresh machine.
-  - *Expected:* MySQL, Backend, and Frontend containers should start successfully, and the database should automatically initialize the `transactions` schema.
-
----
-
-*This document should be updated iteratively as testing progresses.*
+*Note: All Phase 10 automated test executions will be tracked against these criteria.*

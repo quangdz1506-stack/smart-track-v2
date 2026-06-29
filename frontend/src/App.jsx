@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
 import { useTheme } from './context/ThemeContext';
+import { AuthProvider } from './context/AuthContext';
+import { CurrencyProvider } from './context/CurrencyContext';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Budgets from './pages/Budgets';

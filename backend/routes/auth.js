@@ -81,4 +81,25 @@ router.post('/login', async (req, res) => {
     }
 });
 
+const authMiddleware = require('../middleware/authMiddleware');
+
+// @route   DELETE /api/auth/reset
+// @desc    Reset all user data (transactions, budgets, goals)
+// @access  Private
+router.delete('/reset', authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        // Delete all user data
+        await pool.query('DELETE FROM transactions WHERE user_id = ?', [userId]);
+        await pool.query('DELETE FROM budgets WHERE user_id = ?', [userId]);
+        await pool.query('DELETE FROM goals WHERE user_id = ?', [userId]);
+        
+        res.json({ message: 'All user data has been reset successfully' });
+    } catch (err) {
+        console.error('Error resetting user data:', err);
+        res.status(500).json({ error: 'Server error during data reset' });
+    }
+});
+
 module.exports = router;

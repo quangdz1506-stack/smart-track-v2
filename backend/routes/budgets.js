@@ -5,11 +5,24 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 router.use(authMiddleware);
 
-// Get all budgets for user
+// Get all budgets for user with dynamically calculated spent_amount
 router.get('/', async (req, res) => {
   try {
     const userId = req.user.id;
-    const [rows] = await db.query('SELECT * FROM budgets WHERE user_id = ? ORDER BY created_at DESC', [userId]);
+    const query = `
+      SELECT b.id, b.user_id, b.category, b.limit_amount, b.month, b.created_at,
+             COALESCE(SUM(t.amount), 0) AS spent_amount
+      FROM budgets b
+      LEFT JOIN transactions t 
+             ON b.user_id = t.user_id 
+            AND b.category = t.category 
+            AND t.type = 'expense' 
+            AND DATE_FORMAT(t.date, '%Y-%m') = b.month
+      WHERE b.user_id = ?
+      GROUP BY b.id
+      ORDER BY b.created_at DESC
+    `;
+    const [rows] = await db.query(query, [userId]);
     res.json(rows);
   } catch (err) {
     console.error('Error fetching budgets:', err);

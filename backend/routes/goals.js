@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Update goal current amount
+// Update goal current amount (full update)
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { name, target_amount, current_amount, deadline } = req.body;
@@ -55,6 +55,31 @@ router.put('/:id', async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Error updating goal:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// Add funds to a goal
+router.put('/:id/add-funds', async (req, res) => {
+  const { id } = req.params;
+  const { amount } = req.body;
+  const userId = req.user.id;
+  
+  if (!amount || isNaN(amount) || amount <= 0) {
+    return res.status(400).json({ error: 'Valid positive amount is required' });
+  }
+  
+  try {
+    const [result] = await db.query(
+      'UPDATE goals SET current_amount = current_amount + ? WHERE id = ? AND user_id = ?',
+      [amount, id, userId]
+    );
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Goal not found or unauthorized' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error adding funds to goal:', err);
     res.status(500).json({ error: 'Database error' });
   }
 });
