@@ -35,4 +35,32 @@ router.post('/', async (req, res) => {
   }
 });
 
+// @route   GET /api/transactions
+// @desc    Fetch all transactions with optional filtering
+router.get('/', async (req, res) => {
+  try {
+    const { category, type } = req.query;
+    let query = 'SELECT * FROM transactions WHERE 1=1';
+    const queryParams = [];
+
+    if (category) {
+      query += ' AND category = ?';
+      queryParams.push(category);
+    }
+    
+    if (type) {
+      query += ' AND type = ?';
+      queryParams.push(type);
+    }
+
+    query += ' ORDER BY date DESC, created_at DESC';
+
+    const [rows] = await db.query(query, queryParams);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;
