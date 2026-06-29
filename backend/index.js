@@ -17,8 +17,15 @@ app.get('/health', (req, res) => {
   });
 });
 
+const authRoutes = require('./routes/auth');
 const transactionRoutes = require('./routes/transactions');
+const budgetRoutes = require('./routes/budgets');
+const goalRoutes = require('./routes/goals');
+
+app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/budgets', budgetRoutes);
+app.use('/api/goals', goalRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

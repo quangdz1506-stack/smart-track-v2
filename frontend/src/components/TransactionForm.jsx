@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react';
 
-const TransactionForm = ({ onSubmitTransaction, editingTransaction, onCancelEdit }) => {
+const TransactionForm = ({ isOpen, onClose, onSubmitTransaction, editingTransaction, onCancelEdit }) => {
   const [formData, setFormData] = useState({
     amount: '',
     type: 'expense',
@@ -29,7 +28,7 @@ const TransactionForm = ({ onSubmitTransaction, editingTransaction, onCancelEdit
         description: ''
       });
     }
-  }, [editingTransaction]);
+  }, [editingTransaction, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,71 +62,100 @@ const TransactionForm = ({ onSubmitTransaction, editingTransaction, onCancelEdit
     }
   };
 
-  const inputStyle = {
-    width: '100%',
-    padding: '0.75rem',
-    marginBottom: '1rem',
-    borderRadius: '4px',
-    border: '1px solid var(--border-color)',
-    background: 'var(--bg-color)',
-    color: 'var(--text-primary)',
-    boxSizing: 'border-box'
+  const handleClose = () => {
+    if (editingTransaction) {
+      onCancelEdit();
+    }
+    onClose();
   };
 
   return (
-    <div style={{ background: 'var(--surface-color)', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--border-color)', marginBottom: '2rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h3 style={{ margin: 0 }}>{editingTransaction ? 'Edit Transaction' : 'Add Transaction'}</h3>
-        {editingTransaction && (
-          <button 
-            onClick={onCancelEdit}
-            style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
-            type="button"
-          >
-            Cancel Edit
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-md transition-all duration-300 transform ${isOpen ? 'opacity-100 pointer-events-auto scale-100' : 'opacity-0 pointer-events-none scale-95'}`}>
+      <div className="modal-overlay absolute inset-0" onClick={handleClose}></div>
+      <div className="glass-card w-full max-w-lg rounded-3xl shadow-2xl relative z-10 overflow-hidden border border-outline-variant/30 dark:border-white/10">
+        <div className="brand-gradient p-lg flex items-center justify-between glow-primary">
+          <h3 className="font-headline-md text-white">{editingTransaction ? 'Edit Transaction' : 'Add New Transaction'}</h3>
+          <button type="button" className="text-white/80 hover:text-white transition-colors" onClick={handleClose}>
+            <span className="material-symbols-outlined">close</span>
           </button>
-        )}
+        </div>
+        
+        <form onSubmit={handleSubmit} className="p-lg space-y-md bg-surface-container-lowest dark:bg-surface">
+          {error && <p className="text-error text-label-sm">{error}</p>}
+          <div className="grid grid-cols-2 gap-md">
+            
+            <div className="col-span-2 sm:col-span-1">
+              <label className="block text-label-sm text-on-surface-variant mb-2">Amount</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-bold">$</span>
+                <input 
+                  type="number" 
+                  name="amount" 
+                  value={formData.amount} 
+                  onChange={handleChange} 
+                  className="w-full bg-surface-container-low border border-outline-variant/30 dark:border-white/5 rounded-xl py-3 pl-8 pr-4 focus:ring-2 focus:ring-primary/20 outline-none text-on-surface" 
+                  placeholder="0.00" 
+                  step="0.01" 
+                />
+              </div>
+            </div>
+
+            <div className="col-span-2 sm:col-span-1">
+              <label className="block text-label-sm text-on-surface-variant mb-2">Type</label>
+              <select 
+                name="type" 
+                value={formData.type} 
+                onChange={handleChange} 
+                className="w-full bg-surface-container-low border border-outline-variant/30 dark:border-white/5 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 outline-none text-on-surface appearance-none"
+              >
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+            </div>
+
+            <div className="col-span-2 sm:col-span-1">
+              <label className="block text-label-sm text-on-surface-variant mb-2">Category</label>
+              <input 
+                type="text" 
+                name="category" 
+                value={formData.category} 
+                onChange={handleChange} 
+                className="w-full bg-surface-container-low border border-outline-variant/30 dark:border-white/5 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 outline-none text-on-surface" 
+                placeholder="e.g. Groceries" 
+              />
+            </div>
+
+            <div className="col-span-2 sm:col-span-1">
+              <label className="block text-label-sm text-on-surface-variant mb-2">Date</label>
+              <input 
+                type="date" 
+                name="date" 
+                value={formData.date} 
+                onChange={handleChange} 
+                className="w-full bg-surface-container-low border border-outline-variant/30 dark:border-white/5 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 outline-none text-on-surface" 
+              />
+            </div>
+            
+            <div className="col-span-2">
+              <label className="block text-label-sm text-on-surface-variant mb-2">Description (Optional)</label>
+              <input 
+                type="text" 
+                name="description" 
+                value={formData.description} 
+                onChange={handleChange} 
+                className="w-full bg-surface-container-low border border-outline-variant/30 dark:border-white/5 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 outline-none text-on-surface" 
+                placeholder="What did you spend on?" 
+              />
+            </div>
+            
+          </div>
+          <div className="pt-md">
+            <button type="submit" className="w-full py-4 brand-gradient text-white rounded-xl font-bold shadow-lg shadow-primary/20 dark:shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:scale-[1.01] active:scale-95 transition-all">
+              {editingTransaction ? 'Update Transaction' : 'Save Transaction'}
+            </button>
+          </div>
+        </form>
       </div>
-      
-      {error && <p style={{ color: 'var(--danger-color)', marginBottom: '1rem' }}>{error}</p>}
-      
-      <form onSubmit={handleSubmit}>
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '150px' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Amount</label>
-            <input type="number" name="amount" value={formData.amount} onChange={handleChange} style={inputStyle} placeholder="0.00" step="0.01" />
-          </div>
-          
-          <div style={{ flex: 1, minWidth: '150px' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Type</label>
-            <select name="type" value={formData.type} onChange={handleChange} style={inputStyle}>
-              <option value="expense">Expense</option>
-              <option value="income">Income</option>
-            </select>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '150px' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Category</label>
-            <input type="text" name="category" value={formData.category} onChange={handleChange} style={inputStyle} placeholder="e.g. Groceries, Salary" />
-          </div>
-
-          <div style={{ flex: 1, minWidth: '150px' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Date</label>
-            <input type="date" name="date" value={formData.date} onChange={handleChange} style={inputStyle} />
-          </div>
-        </div>
-
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Description (Optional)</label>
-          <input type="text" name="description" value={formData.description} onChange={handleChange} style={inputStyle} placeholder="Add a note..." />
-        </div>
-
-        <button type="submit" style={{ padding: '0.75rem 1.5rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-          {editingTransaction ? 'Update Transaction' : 'Add Transaction'}
-        </button>
-      </form>
     </div>
   );
 };

@@ -54,3 +54,7 @@ A web-based Smart Expense Tracker built over a strict 7-day timeline. The core f
 ### Rule 9: Version Control Checkpoints
 - Upon the successful completion (✅) of any significant task or sub-task, automatically generate and output a `git commit` command with a concise, professional message in English (e.g., `git commit -m "feat: implement theme toggle context"`).
 - This ensures an immediate rollback point if the next task introduces critical failures.
+
+### Rule 10: Automatic Server Execution
+- When performing testing or starting a new chat session, you MUST automatically start the backend and frontend development servers (or Docker containers) in the background without asking the user.
+- This ensures the application is always running and ready for verification or interaction.

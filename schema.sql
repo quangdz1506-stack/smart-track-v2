@@ -1,9 +1,46 @@
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS budgets;
+DROP TABLE IF EXISTS goals;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS transactions (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     amount DECIMAL(10, 2) NOT NULL,
     type ENUM('income', 'expense') NOT NULL,
     category VARCHAR(50) NOT NULL,
     date DATE NOT NULL,
     description TEXT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS budgets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    limit_amount DECIMAL(10, 2) NOT NULL,
+    spent_amount DECIMAL(10, 2) DEFAULT 0.00,
+    month VARCHAR(7) NOT NULL, -- e.g., '2023-10'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS goals (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    target_amount DECIMAL(10, 2) NOT NULL,
+    current_amount DECIMAL(10, 2) DEFAULT 0.00,
+    deadline DATE NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

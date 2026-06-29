@@ -1,11 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const authMiddleware = require('../middleware/authMiddleware');
+
+// Protect all transaction routes
+router.use(authMiddleware);
 
 // @route   POST /api/transactions
 // @desc    Create a new transaction
 router.post('/', async (req, res) => {
   const { amount, type, category, date, description } = req.body;
+  const userId = req.user.id;
 
   // Validation
   if (!amount || amount <= 0 || isNaN(amount)) {
@@ -22,8 +27,8 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const query = 'INSERT INTO transactions (amount, type, category, date, description) VALUES (?, ?, ?, ?, ?)';
-    const [result] = await db.query(query, [amount, type, category, date, description || null]);
+    const query = 'INSERT INTO transactions (user_id, amount, type, category, date, description) VALUES (?, ?, ?, ?, ?, ?)';
+    const [result] = await db.query(query, [userId, amount, type, category, date, description || null]);
     
     res.status(201).json({ 
       message: 'Transaction created successfully', 
@@ -36,12 +41,13 @@ router.post('/', async (req, res) => {
 });
 
 // @route   GET /api/transactions
-// @desc    Fetch all transactions with optional filtering
+// @desc    Fetch all transactions for logged in user with optional filtering
 router.get('/', async (req, res) => {
   try {
     const { category, type } = req.query;
-    let query = 'SELECT * FROM transactions WHERE 1=1';
-    const queryParams = [];
+    const userId = req.user.id;
+    let query = 'SELECT * FROM transactions WHERE user_id = ?';
+    const queryParams = [userId];
 
     if (category) {
       query += ' AND category = ?';
@@ -68,6 +74,8 @@ router.get('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
+    const userId = req.user.id;
+    
     if (isNaN(id) || id <= 0) {
       return res.status(400).json({ error: 'Invalid transaction ID' });
     }
@@ -87,11 +95,11 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'Valid date is required' });
     }
 
-    const query = 'UPDATE transactions SET amount = ?, type = ?, category = ?, date = ?, description = ? WHERE id = ?';
-    const [result] = await db.query(query, [amount, type, category, date, description || null, id]);
+    const query = 'UPDATE transactions SET amount = ?, type = ?, category = ?, date = ?, description = ? WHERE id = ? AND user_id = ?';
+    const [result] = await db.query(query, [amount, type, category, date, description || null, id, userId]);
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Transaction not found' });
+      return res.status(404).json({ error: 'Transaction not found or unauthorized' });
     }
 
     res.status(200).json({ message: 'Transaction updated successfully' });
@@ -106,15 +114,17 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
+    const userId = req.user.id;
+    
     if (isNaN(id) || id <= 0) {
       return res.status(400).json({ error: 'Invalid transaction ID' });
     }
 
-    const query = 'DELETE FROM transactions WHERE id = ?';
-    const [result] = await db.query(query, [id]);
+    const query = 'DELETE FROM transactions WHERE id = ? AND user_id = ?';
+    const [result] = await db.query(query, [id, userId]);
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Transaction not found' });
+      return res.status(404).json({ error: 'Transaction not found or unauthorized' });
     }
 
     res.status(200).json({ message: 'Transaction deleted successfully' });

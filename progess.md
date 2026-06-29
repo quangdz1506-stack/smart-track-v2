@@ -40,3 +40,25 @@
 - ✅ Task 6.2: Backend Dockerfile
 - ✅ Task 6.3: Frontend Dockerfile
 - ✅ Task 6.4: Docker Compose Orchestration
+## Current Phase: Phase 7 (UI Upgrade via Stitch)
+- ✅ Task 7.1: Fetch Project and CSS Tokens from Stitch.
+- ✅ Task 7.2: Global CSS Refactoring (Tailwind integration).
+- ✅ Task 7.3: Component Integration (Dashboard layout, modal).
+- ✅ Task 7.4: Verification (Tested rendering and logic flow).
+
+## Current Phase: Phase 8 (Routing Features)
+- ✅ Task 8.1: Backend Data Layer for Budgets/Goals.
+- ✅ Task 8.2: Frontend Routing Architecture.
+- ✅ Task 8.3: Build Pages UI (Budgets, Goals, Settings).
+
+## Current Phase: Phase 9 (Authentication & Security)
+- ✅ Task 9.1: Update Database Schema for Users.
+- ✅ Task 9.2: Backend API Auth Endpoints (Register & Login).
+- ✅ Task 9.3: Frontend Auth Context & Route Guards.
+- ✅ Task 9.4: Build Login and Registration UI Components.
+
+## Current Phase: Phase 10 (End-to-End Automation Testing)
+- ⬜ Task 10.1: Initialize E2E Testing Framework.
+- ⬜ Task 10.2: Write Auth Flow Test Scripts.
+- ⬜ Task 10.3: Write Transaction CRUD Test Scripts.
+- ⬜ Task 10.4: CI Pipeline Integration.
