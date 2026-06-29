@@ -34,3 +34,9 @@
 - ✅ Task 5.1: LocalStorage Theme Persistence
 - ✅ Task 5.2: Recharts Dashboard Data Visualization
 - ✅ Task 5.3: Edit Transaction Feature (Full Stack)
+
+## Current Phase: Phase 6 (DevOps & CI/CD - Option B)
+- ✅ Task 6.1: GitHub Actions Configuration
+- ✅ Task 6.2: Backend Dockerfile
+- ✅ Task 6.3: Frontend Dockerfile
+- ✅ Task 6.4: Docker Compose Orchestration
