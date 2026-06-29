@@ -17,6 +17,9 @@ app.get('/health', (req, res) => {
   });
 });
 
+const transactionRoutes = require('./routes/transactions');
+app.use('/api/transactions', transactionRoutes);
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
