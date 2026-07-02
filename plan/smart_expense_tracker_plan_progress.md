@@ -59,3 +59,11 @@
 - ✅ Task 9.4: Login & Register UI Pages (Glassmorphism)
 - ✅ Task 9.5: Frontend API service updated with `Authorization: Bearer` headers
 - ✅ Task 9.6: Full Backend Audit (18/18 tests passed on Laragon)
+
+## Current Phase: Phase 10 (End-to-End Automation Testing)
+- ✅ Task 10.1: Initialize E2E Testing Framework (Playwright configured for `localhost:5173`)
+- ✅ Task 10.2: Write Auth Flow Test Scripts (`auth.spec.js` created and passed)
+- ✅ Task 10.3: Write Transaction CRUD Test Scripts (`transactions.spec.js` created and passed)
+- ⏭️ Task 10.4: CI Pipeline Integration (Skipped based on Laragon local preference)
+
+## Next Phase: Phase 11 (Final Review & Polish)

@@ -90,9 +90,8 @@ const Dashboard = () => {
           <button onClick={() => { setEditingTransaction(null); setIsModalOpen(true); }} className="flex items-center gap-1 px-4 py-2 brand-gradient text-white rounded-xl font-label-md shadow-sm dark:shadow-lg dark:glow-primary hover:shadow-md active:opacity-90 transition-all md:hidden">
             <span className="material-symbols-outlined text-[18px]">add</span> Add
           </button>
-          <button className="hidden md:flex items-center gap-1 px-4 py-2 bg-surface-container-lowest dark:bg-surface-container/50 rounded-xl font-label-md text-on-surface shadow-sm border border-outline-variant/30 dark:border-white/10 hover:bg-surface-container-high transition-colors">
-            <span className="material-symbols-outlined text-[18px]">file_download</span>
-            Export
+          <button onClick={() => { setEditingTransaction(null); setIsModalOpen(true); }} className="hidden md:flex items-center gap-1 px-4 py-2 brand-gradient text-white rounded-xl font-label-md shadow-sm dark:shadow-lg dark:glow-primary hover:shadow-md active:opacity-90 transition-all">
+            <span className="material-symbols-outlined text-[18px]">add</span> Add Entry
           </button>
         </div>
       </div>
