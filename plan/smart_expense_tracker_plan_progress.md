@@ -51,3 +51,11 @@
 - ✅ Task 8.2: Frontend Infrastructure (React Router)
 - ✅ Task 8.3: Build Budgets, Goals, and Settings Pages
 - ✅ Task 8.4: Verification (Tested SPA Navigation)
+
+## Current Phase: Phase 9 (User Authentication & Security)
+- ✅ Task 9.1: Database Schema updated (`users` table, `user_id` foreign keys)
+- ✅ Task 9.2: Backend Auth API (Register, Login, JWT middleware, route guards)
+- ✅ Task 9.3: Frontend AuthContext & ProtectedRoute
+- ✅ Task 9.4: Login & Register UI Pages (Glassmorphism)
+- ✅ Task 9.5: Frontend API service updated with `Authorization: Bearer` headers
+- ✅ Task 9.6: Full Backend Audit (18/18 tests passed on Laragon)
