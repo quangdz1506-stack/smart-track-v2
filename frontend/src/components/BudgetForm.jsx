@@ -18,6 +18,23 @@ const BudgetForm = ({ isOpen, onClose, onSubmitBudget }) => {
       setError('Limit amount must be a positive number');
       return;
     }
+
+    if (month) {
+      const [yearStr, monthStr] = month.split('-');
+      if (yearStr && monthStr) {
+        const selectedMonth = new Date(Number(yearStr), Number(monthStr) - 1);
+        const today = new Date();
+        const currentMonth = new Date(today.getFullYear(), today.getMonth());
+        if (selectedMonth < currentMonth) {
+          setError('Budget month cannot be in the past');
+          return;
+        }
+      } else {
+        setError('Invalid month format. Use YYYY-MM');
+        return;
+      }
+    }
+
     setError('');
     onSubmitBudget({
       category,
@@ -70,7 +87,8 @@ const BudgetForm = ({ isOpen, onClose, onSubmitBudget }) => {
             <div>
               <label className="block text-label-md text-on-surface-variant mb-1">Month (YYYY-MM)</label>
               <input 
-                type="month" 
+                type="text" 
+                placeholder="YYYY-MM"
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
                 className="w-full bg-surface-container-lowest border border-outline-variant/30 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"

@@ -5,41 +5,49 @@
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
 
-A modern, full-stack personal finance application designed to help users seamlessly track their income and expenses, visualize financial habits, and maintain a healthy budget. Built with a focus on clean architecture, responsive UI, and robust state management.
+A modern, full-stack personal finance application designed to help users seamlessly track their income and expenses, manage monthly budgets, and achieve long-term financial goals. Built with a focus on clean architecture, beautiful glassmorphism UI, robust state management, and full End-to-End (E2E) testing.
 
 ---
 
 ## 🌟 Key Features
 
-*   **Comprehensive Dashboard:** Real-time calculation of Total Income, Total Expenses, and Net Balance.
-*   **Data Visualization:** Interactive Pie and Bar charts powered by **Recharts** to analyze spending versus earning.
+*   **Secure Authentication:** Full JWT-based authentication with bcrypt password hashing for multi-user isolation.
+*   **Comprehensive Dashboard:** Real-time calculation of Total Income, Total Expenses, and Net Balance with Recharts visualization.
+*   **Smart Budgets:** Set monthly limits per category. The system automatically calculates your `spent_amount` from your transactions and warns you with dynamic progress bars if you overspend.
+*   **Financial Goals:** Create savings goals with deadlines and incrementally add funds to track your progress visually.
 *   **Full CRUD Capabilities:** Seamlessly Add, View, Edit, and Delete financial transactions.
-*   **Persistent Theme Toggling:** A custom Light/Dark mode implementation that saves user preferences via `localStorage`.
-*   **Robust Backend API:** RESTful architecture built with Node.js & Express, featuring strict input sanitization and parameterized MySQL queries to prevent SQL injection.
-*   **Asynchronous UI State:** Smooth optimistic rendering with graceful error handling if the network connection drops.
+*   **User Preferences & Settings:** Persistent Light/Dark mode toggling and a Global Currency Selector (USD/EUR/VND).
+*   **Danger Zone:** Safely wipe all your user data with one click (protected by confirmation dialogs and backend cascade deletions).
+*   **End-to-End Tested:** Critical user flows (Authentication & Transaction CRUD) are fully covered by automated Playwright E2E tests.
 
 ## 🛠️ Technology Stack
 
 **Frontend Layer:**
-*   **React 18** (Functional Components & Custom Hooks)
+*   **React 18** (Functional Components, Custom Hooks, Context API)
+*   **React Router DOM** (Client-side routing)
 *   **Vite** (Next-generation lightning-fast frontend tooling)
 *   **Recharts** (Declarative charting library)
-*   **Pure CSS3** (CSS Variables, Flexbox, and CSS Grid for responsive design)
+*   **Pure CSS3** (Glassmorphism design, CSS Variables, Flexbox, and Grid)
 
 **Backend Layer:**
-*   **Node.js & Express.js** (Non-blocking I/O web server)
-*   **MySQL2** (Promise-based MySQL driver leveraging Connection Pools for high concurrency)
+*   **Node.js & Express.js** (Non-blocking I/O REST API)
+*   **MySQL2** (Relational database with optimized Data Definition and Foreign Keys)
+*   **JSON Web Tokens (JWT) & bcrypt** (Security and Authentication)
 *   **CORS & Dotenv** (Security and environment configuration)
+
+**Testing Layer:**
+*   **Playwright** (Automated UI/DOM End-to-End Testing Framework)
 
 ---
 
 ## ⚙️ Architecture & Data Flow
 
 The application follows a classic multi-tier architecture:
-1.  **Presentation Tier (React):** Handles routing, local state (`useState`, `useEffect`), and dynamic rendering. Interacts with the backend via a centralized HTTP abstraction (`services/api.js`).
-2.  **Logic Tier (Express):** Receives HTTP requests, validates payload integrity, and structures SQL commands.
-3.  **Data Tier (MySQL):** A relational database storing transactions with optimized data types (`DECIMAL` for currency, `DATETIME` for auditing).
+1.  **Presentation Tier (React):** Handles routing, local state, global contexts (`AuthContext`, `ThemeContext`, `CurrencyContext`), and dynamic rendering. Interacts with the backend via a centralized HTTP abstraction (`services/api.js`) that automatically injects `Bearer` tokens.
+2.  **Logic Tier (Express):** Protects routes with middleware, validates payload integrity, and structures SQL commands.
+3.  **Data Tier (MySQL):** A relational database storing `users`, `transactions`, `budgets`, and `goals` with foreign key constraints ensuring data integrity.
 
 ---
 
@@ -54,7 +62,7 @@ Follow these instructions to get a local copy up and running.
 ### 1. Database Setup
 1. Open your MySQL client or CLI.
 2. Create a new database named `smart_expense_tracker`.
-3. Run the provided `schema.sql` file located in the root directory to generate the `transactions` table.
+3. Run the provided `backend/config/schema.sql` file to generate all necessary tables.
 
 ### 2. Backend Setup
 ```bash
@@ -70,9 +78,10 @@ echo "DB_USER=root" >> .env
 echo "DB_PASSWORD=" >> .env
 echo "DB_NAME=smart_expense_tracker" >> .env
 echo "PORT=5000" >> .env
+echo "JWT_SECRET=your_super_secret_key" >> .env
 
 # Start the Node.js server
-node index.js
+npm start
 ```
 
 ### 3. Frontend Setup
@@ -89,27 +98,39 @@ npm run dev
 ```
 Navigate to `http://localhost:5173/` in your browser.
 
+### 4. Running E2E Tests
+```bash
+cd frontend
+npx playwright test
+```
+
 ---
 
 ## 📡 API Reference
 
-The backend exposes a clean REST API running by default on port `5000`:
+The backend exposes a clean, authenticated REST API:
 
-| Method   | Endpoint                  | Description                                      |
-| :------- | :------------------------ | :----------------------------------------------- |
-| `GET`    | `/api/transactions`       | Fetch all transactions (supports query filters). |
-| `POST`   | `/api/transactions`       | Create a new transaction.                        |
-| `PUT`    | `/api/transactions/:id`   | Update an existing transaction by ID.            |
-| `DELETE` | `/api/transactions/:id`   | Delete a transaction by ID.                      |
+### Authentication
+* `POST /api/auth/register` - Register a new user
+* `POST /api/auth/login` - Authenticate user & get token
+* `DELETE /api/auth/reset` - (Protected) Reset all user data
+
+### Transactions
+* `GET /api/transactions` - Fetch all user transactions
+* `POST /api/transactions` - Create a transaction
+* `PUT /api/transactions/:id` - Update transaction
+* `DELETE /api/transactions/:id` - Delete transaction
+
+### Budgets
+* `GET /api/budgets` - Fetch all budgets (with dynamic spent amounts via SQL JOIN)
+* `POST /api/budgets` - Create a budget limit
+* `DELETE /api/budgets/:id` - Delete budget
+
+### Goals
+* `GET /api/goals` - Fetch all savings goals
+* `POST /api/goals` - Create a goal
+* `PUT /api/goals/:id/add-funds` - Incrementally add funds to a goal
+* `DELETE /api/goals/:id` - Delete goal
 
 ---
-
-## 🎯 Future Roadmap (CI/CD & DevOps)
-
-*   [ ] Implement **JWT Authentication** to support multiple individual users.
-*   [ ] Containerize the application using **Docker & Docker Compose**.
-*   [ ] Automate testing and deployment using **GitHub Actions**.
-*   [ ] Implement advanced filtering capabilities (by date range, category tags).
-
----
-*This project was developed to showcase full-stack engineering, clean code principles, and an eye for modern UI/UX design.*
+*This project was developed to showcase full-stack engineering, strict context adherence, modern UI/UX design, and E2E testing automation.*

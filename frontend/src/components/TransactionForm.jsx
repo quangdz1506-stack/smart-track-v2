@@ -48,6 +48,15 @@ const TransactionForm = ({ isOpen, onClose, onSubmitTransaction, editingTransact
     if (!formData.date) {
       return setError('Date is required.');
     }
+    
+    if (formData.date) {
+      const selectedDate = new Date(formData.date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selectedDate < today) {
+        return setError('Date cannot be in the past.');
+      }
+    }
 
     onSubmitTransaction(formData);
     
@@ -126,9 +135,10 @@ const TransactionForm = ({ isOpen, onClose, onSubmitTransaction, editingTransact
             </div>
 
             <div className="col-span-2 sm:col-span-1">
-              <label className="block text-label-sm text-on-surface-variant mb-2">Date</label>
+              <label className="block text-label-sm text-on-surface-variant mb-2">Date (YYYY-MM-DD)</label>
               <input 
-                type="date" 
+                type="text" 
+                placeholder="YYYY-MM-DD"
                 name="date" 
                 value={formData.date} 
                 onChange={handleChange} 

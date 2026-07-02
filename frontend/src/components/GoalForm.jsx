@@ -18,6 +18,17 @@ const GoalForm = ({ isOpen, onClose, onSubmitGoal }) => {
       setError('Target amount must be a positive number');
       return;
     }
+    
+    if (deadline) {
+      const selectedDate = new Date(deadline);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selectedDate < today) {
+        setError('Deadline cannot be in the past');
+        return;
+      }
+    }
+
     setError('');
     onSubmitGoal({
       name,
@@ -68,9 +79,10 @@ const GoalForm = ({ isOpen, onClose, onSubmitGoal }) => {
             </div>
             
             <div>
-              <label className="block text-label-md text-on-surface-variant mb-1">Deadline (Optional)</label>
+              <label className="block text-label-md text-on-surface-variant mb-1">Deadline (YYYY-MM-DD) (Optional)</label>
               <input 
-                type="date" 
+                type="text" 
+                placeholder="YYYY-MM-DD"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
                 className="w-full bg-surface-container-lowest border border-outline-variant/30 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
